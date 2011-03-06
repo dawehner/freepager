@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Declares Views API version. That's it!
+ */
+
+/**
+ * Implementation of hook_views_api().
+ */
+function freepager_views_api() {
+  return array(
+    'api' => '2.0',
+  );
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function freepager_init() {
+  $path = drupal_get_path('module', 'freepager') .'/freepager.css';
+  drupal_add_css($path, 'module', 'all', FALSE);
+}

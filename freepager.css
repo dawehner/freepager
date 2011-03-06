@@ -1,0 +1,13 @@
+/* $Id$ */
+/**
+ * @file freepager.css
+ * Basic CSS for Free Pager.
+ **/
+
+.freepager-previous {
+  text-align: left;
+}
+
+.freepager-next {
+  float: right;
+}
