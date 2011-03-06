@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file freepager_plugin_style.tpl.php
  * Contains the style plugin for Free Pager.

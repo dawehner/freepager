@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file freepager.tpl.php
  * Default view template to display Free Pager.

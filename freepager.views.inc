@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * @file
  * Declares the Views plugin for paging.
