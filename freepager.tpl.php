@@ -9,6 +9,8 @@
  *   The index of the currently viewed item in the list. (Starting on zero!)
  * $rows['total']
  *   The total number of items in the list.
+ * $rows['current']['text']
+ *   The text designated for the current row. FALSE if no field is set.
  * $rows['previous']['link']
  *   The rendered link for the previous link.
  * $rows['previous']['text']
@@ -37,4 +39,9 @@
   <span class="freepager-next">
     <?php print $rows['next']['link']; ?>
   </span>
+<?php endif; ?>
+<?php if (!empty($rows['current']['text'])): ?>
+  <div class="freepager-current">
+    <?php print $rows['current']['text']; ?>
+  </div>
 <?php endif; ?>

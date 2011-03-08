@@ -16,6 +16,7 @@ class freepager_plugin_style extends views_plugin_style {
    */
   function options(&$options) {
     parent::options($options);
+    $options['current'] = 0;
   }
 
   /**
@@ -76,6 +77,15 @@ class freepager_plugin_style extends views_plugin_style {
       '#default_value' => $this->options['next'],
     );
 
+    $form['current'] = array(
+      '#type' => 'select',
+      '#title' => t('Text for current item'),
+      '#description' => t('If you want to show a text for the current item,
+        select the field containing that text.'),
+      '#options' => array(0 => '(no text)') + $options,
+      '#default_value' => $this->options['current'],
+    );
+
     $form['render_html'] = array(
       '#type' => 'checkbox',
       '#title' => t('Accept HTML'),
@@ -107,6 +117,7 @@ class freepager_plugin_style extends views_plugin_style {
     $path_field = $this->options['path'];
     $previous_field = $this->options['previous'];
     $next_field = $this->options['next'];
+    $current_field = $this->options['current'];
 
     // Go through the list of paths in the defined path field, to see which row
     // (if any) matches the current (internal) path. Only first hit is used.
@@ -133,6 +144,15 @@ class freepager_plugin_style extends views_plugin_style {
     if (isset($rows['current_row'])) {
       // Set total number of rows, in case a themer wants to display this.
       $rows['total'] = count($this->rendered_fields);
+      // Set the current text, if applicable.
+      if ($current_field) {
+        $rows['current']['text'] =
+          $this->rendered_fields[$rows['current_row']][$current_field];
+        // If fields aren't set to rendering HTML, escape the field content.
+        if (!($this->options['render_html'])) {
+          $rows['current']['text'] = check_plain($rows['current']['text']);
+        }
+      }
       // Set link, text and path for the previous row.
       $rows['previous'] = array(
         'link' => l(
