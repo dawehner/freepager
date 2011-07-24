@@ -36,3 +36,27 @@ that really could be better:
 
 If you have skills in writing Views plugins I would be more than happy to hear
 what mistakes I have made, and how it could be made better. :-)
+
+
+EXAMPLE USE
+===========
+To create a pager allowing browsing through all the articles on your site, do
+the following:
+
+* Create a new view. In the quick-wizard, configure the view to display content
+  that are articles only, sorted with newest on top.
+* Also in the quick-wizard, check to add a block only. Have it using the Pager
+  display, showing titles without links. Continue into the main configuration
+  panel for Views.
+* Make sure that there is no pager – all items should be listed.
+* Add a new field with node ID, rewritten to the form "node/[nid]".
+* Change the settings for the style, selecting the title field to use for both
+  forward and next texts. Use the NID field for path.
+* Save the view. Go to the block admin page and place the block in a region of
+  choice.
+-> When you view an article, the nearest newer and older article will appear in
+  the block.
+-> When not viewing an article, the block will still load, and display any title
+  configured for the block. (Though it will have no content.) This is an
+  undesired side-effect. Sorry about that.
+
