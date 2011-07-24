@@ -10,11 +10,6 @@
  * @ingroup views_style_plugins
  */
 class freepager_plugin_style extends views_plugin_style {
-
-  function  uses_fields() {
-    return TRUE;
-  }
-
   /**
    * Set default options.
    */
@@ -185,7 +180,6 @@ class freepager_plugin_style extends views_plugin_style {
         'view' => $this->view,
         'options' => $this->options,
         'rows' => $rows,
-        'title' => $title,
       ));
     }
   }
