@@ -181,12 +181,11 @@ class freepager_plugin_style extends views_plugin_style {
       );
 
       // Theme the whole shebang and send it off.
-      return theme('freepager', array('rows' => $rows,
-//        $this->theme_functions(),
-        $this->view,
-        $this->options,
-        $rows,
-        $title,
+      return theme($this->theme_functions(), array(
+        'view' => $this->view,
+        'options' => $this->options,
+        'rows' => $rows,
+        'title' => $title,
       ));
     }
   }
