@@ -11,6 +11,10 @@
  */
 class freepager_plugin_style extends views_plugin_style {
 
+  function  uses_fields() {
+    return TRUE;
+  }
+
   /**
    * Set default options.
    */
@@ -177,23 +181,36 @@ class freepager_plugin_style extends views_plugin_style {
       );
 
       // Theme the whole shebang and send it off.
-      return theme($this->theme_functions(), $this->view, $this->options, $rows, $title);
+      return theme('freepager', array('rows' => $rows,
+//        $this->theme_functions(),
+        $this->view,
+        $this->options,
+        $rows,
+        $title,
+      ));
     }
   }
 
   function validate() {
     $errors = parent::validate();
-    if (empty($this->options['path'])) {
-      $errors[] = t('The \'path\' setting for @display (pager display) is missing.',
-        array('@display' => $this->display->display_title));
-    }
-    if (empty($this->options['previous'])) {
-      $errors[] = t('The \'previous\' setting for @display (pager display) is missing.',
-        array('@display' => $this->display->display_title));
-    }
-    if (empty($this->options['next'])) {
-      $errors[] = t('The \'next\' setting for @display (pager display) is missing.',
-        array('@display' => $this->display->display_title));
+
+    // Don't check for these errors in the Views quick-wizard, since it won't
+    // let you go into the main configuration panel until all the errors are
+    // fixed. This is a quick and ugly hack. Sorry.
+    if (arg() != array('admin', 'structure', 'views', 'add')) {
+      if (empty($this->options['path'])) {
+        $errors[] = t('The \'path\' setting for @display (pager display) is missing.',
+          array('@display' => $this->display->display_title));
+      }
+      if (empty($this->options['previous'])) {
+        $errors[] = t('The \'previous\' setting for @display (pager display) is missing.',
+          array('@display' => $this->display->display_title));
+      }
+      if (empty($this->options['next'])) {
+        $errors[] = t('The \'next\' setting for @display (pager display) is missing.',
+          array('@display' => $this->display->display_title));
+      }
+
     }
 //
 //    if ($this->view->pager['items_per_page'] != 0) {

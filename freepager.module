@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Declares Views API version. That's it!
+ * Declares Views API version. And adds CSS.
  */
 
 /**
@@ -10,7 +10,7 @@
  */
 function freepager_views_api() {
   return array(
-    'api' => '2.0',
+    'api' => '3.0',
   );
 }
 
