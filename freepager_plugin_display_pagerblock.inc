@@ -47,7 +47,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
       $options[$name] = array(
         'category' => 'freepager_block',
         'title' => $setting['label'],
-        'value' => $field_labels[$this->get_option($name)],
+        'value' => $this->get_option($name) ? $field_labels[$this->get_option($name)] : t('(none)'),
       );
     }
   }
