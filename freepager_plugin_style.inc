@@ -9,12 +9,11 @@
  *
  * @ingroup views_style_plugins
  */
-class freepager_plugin_style extends views_plugin_display {
+class freepager_plugin_style extends views_plugin_display_block {
   function option_definition() {
     $options = parent::option_definition();
 
-    $options['block_description'] = array('default' => '', 'translatable' => TRUE);
-    $options['block_caching'] = array('default' => DRUPAL_NO_CACHE);
+    $options['previous'] = array('default' => '');
 
     return $options;
   }
@@ -45,19 +44,6 @@ class freepager_plugin_style extends views_plugin_display {
   }
 
   /**
-   * The display block handler returns the structure necessary for a block.
-   */
-  function execute() {
-    // Prior to this being called, the $view should already be set to this
-    // display, and arguments should be set on the view.
-    $info['content'] = $this->view->render();
-    $info['subject'] = filter_xss_admin($this->view->get_title());
-    if (!empty($this->view->result) || $this->get_option('empty') || !empty($this->view->style_plugin->definition['even empty'])) {
-      return $info;
-    }
-  }
-
-  /**
    * Provide the summary for page options in the views UI.
    *
    * This output is returned as an array.
@@ -66,6 +52,7 @@ class freepager_plugin_style extends views_plugin_display {
     // It is very important to call the parent function here:
     parent::options_summary($categories, $options);
 
+    unset($categories['block']);
     $categories['freepager'] = array(
       'title' => t('Pager block settings'),
       'column' => 'second',
@@ -80,9 +67,24 @@ class freepager_plugin_style extends views_plugin_display {
     }
 
     $options['block_description'] = array(
-      'category' => 'block',
+      'category' => 'freepager',
       'title' => t('Block name'),
       'value' => views_ui_truncate($block_description, 24),
+    );
+    $options['previous'] = array(
+      'category' => 'freepager',
+      'title' => t('Previous'),
+      'value' => t('Replace me later.'),
+    );
+    $options['current'] = array(
+      'category' => 'freepager',
+      'title' => t('Current'),
+      'value' => t('Replace me later.'),
+    );
+    $options['next'] = array(
+      'category' => 'freepager',
+      'title' => t('Next'),
+      'value' => t('Replace me later.'),
     );
 
     $cache_type = $this->get_option('block_caching');
@@ -152,6 +154,18 @@ class freepager_plugin_style extends views_plugin_display {
           '#default_value' => $this->get_cache_type(),
         );
         break;
+      case 'previous':
+      case 'current':
+      case 'next':
+        $form['#title'] .= t('Previous/Current/Next');
+
+        $form[$form_state['section']] = array(
+          '#type' => 'select',
+          '#description' => t("Some description."),
+          '#options' => array('alpha', 'beta', 'gamma'),
+          '#default_value' => $this->get_option($form_state['section']),
+        );
+        break;
     }
   }
 
@@ -173,64 +187,12 @@ class freepager_plugin_style extends views_plugin_display {
         $this->set_option('block_caching', $form_state['values']['block_caching']);
         $this->save_block_cache($form_state['view']->name . '-'. $form_state['display_id'], $form_state['values']['block_caching']);
         break;
-    }
-  }
-
-  /**
-   * Block views use exposed widgets only if AJAX is set.
-   */
-  function uses_exposed() {
-    if ($this->use_ajax()) {
-      return parent::uses_exposed();
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * Update the block delta when you change the machine readable name of the display.
-   */
-  function update_block_bid($name, $old_delta, $delta) {
-    $old_hashes = $hashes = variable_get('views_block_hashes', array());
-
-    $old_delta = $name . '-' . $old_delta;
-    $delta = $name . '-' . $delta;
-    if (strlen($old_delta) >= 32) {
-      $old_delta = md5($old_delta);
-      unset($hashes[$old_delta]);
-    }
-    if (strlen($delta) >= 32) {
-      $md5_delta = md5($delta);
-      $hashes[$md5_delta] = $delta;
-      $delta = $md5_delta;
-    }
-    db_update('block')
-      ->fields(array('delta' => $delta))
-      ->condition('delta', $old_delta)
-      ->execute();
-
-    // Update the hashes if needed.
-    if ($hashes != $old_hashes) {
-      variable_set('views_block_hashes', $hashes);
-    }
-  }
-  /**
-   * Save the block cache setting in the blocks table if this block allready
-   * exists in the blocks table. Dirty fix untill http://drupal.org/node/235673 gets in.
-   */
-  function save_block_cache($delta, $cache_setting) {
-    if (strlen($delta) >= 32) {
-      $delta = md5($delta);
-    }
-    if (db_table_exists('block') && $bid = db_query("SELECT bid FROM {block} WHERE module = 'views' AND delta = :delta", array(
-        ':delta' => $delta))->fetchField()) {
-      db_update('block')
-        ->fields(array(
-        'cache' => $cache_setting,
-        ))
-        ->condition('module','views')
-        ->condition('delta', $delta)
-        ->execute();
+      case 'previous':
+      case 'current':
+      case 'next':
+        $this->set_option($form_state['section'], $form_state['values'][$form_state['section']]);
+        $this->save_block_cache($form_state['view']->name . '-'. $form_state['display_id'], $form_state['values'][$form_state['section']]);
+        break;
     }
   }
 }
