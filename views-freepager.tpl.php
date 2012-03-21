@@ -27,22 +27,7 @@
  * @ingroup views_templates
  */
 ?>
-Am I here?
-<?php if (!empty($title)): ?>
-  <h3><?php print $title; ?></h3>
-<?php endif; ?>
-<?php if (!empty($rows['previous']['path'])): ?>
-  <span class="freepager-previous">
-    <?php print $rows['previous']['link']; ?>
-  </span>
-<?php endif; ?>
-<?php if (!empty($rows['next']['path'])): ?>
-  <span class="freepager-next">
-    <?php print $rows['next']['link']; ?>
-  </span>
-<?php endif; ?>
-<?php if (!empty($rows['current']['text'])): ?>
-  <div class="freepager-current">
-    <?php print $rows['current']['text']; ?>
-  </div>
-<?php endif; ?>
+
+<?php print $previous; ?><br />
+<?php print $current; ?><br />
+<?php print $next; ?><br />

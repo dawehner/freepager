@@ -23,10 +23,25 @@ function freepager_init() {
 }
 
 function freepager_preprocess_views_freepager(&$vars) {
+  $view = &$vars['view'];
   $fields = array('path', 'previous', 'current', 'next');
   
   foreach($fields as $field) {
     $field_names[$field] = $vars['view']->display_handler->options[$field];
   }
-  dpm($vars['view']->result);
+
+  $current_path = implode('/', arg());
+
+  foreach ($view->result as $key => $row) {
+    $rendered_path = $view->render_field($field_names['path'], $key);
+    if ($rendered_path == $current_path) {
+      $vars['previous'] = $view->render_field($field_names['previous'], $key - 1);
+      $vars['previous_path'] = $view->render_field($field_names['path'], $key - 1);
+      $vars['current'] = $view->render_field($field_names['current'], $key);
+      $vars['current_path'] = $view->render_field($field_names['path'], $key);
+      $vars['next'] = $view->render_field($field_names['next'], $key + 1);
+      $vars['next_path'] = $view->render_field($field_names['path'], $key + 1);
+      $vars['row_number'] = $key;
+    }
+  }
 }
