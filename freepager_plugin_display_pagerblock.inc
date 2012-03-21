@@ -69,7 +69,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
       $form[$form_state['section']] = array(
         '#type' => 'select',
         '#description' => $freepager_settings[$section]['description'],
-        '#options' => $this->get_field_labels() + array(FALSE => t('(none)')),
+        '#options' => array(FALSE => t('(none)')) + $this->get_field_labels(),
         '#default_value' => $this->get_option($section),
       );
     }
