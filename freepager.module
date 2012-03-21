@@ -14,6 +14,27 @@ function freepager_views_api() {
   );
 }
 
+function freepager_settings() {
+  return array(
+    'path' => array(
+      'label' => t('Field containing path'),
+      'description' => t("Select the field containing the paths managed by this pager. Field could contain something on the form 'node/[nid]'."),
+    ),
+    'previous' => array(
+      'label' => t("Field for 'previous'"),
+      'description' => t('Select the field containing data used for linking to previous item.'),
+    ),
+    'current' => array(
+      'label' => t("Field for 'current'"),
+      'description' => t('Select the field containing data used for showing the currently viewed item.'),
+    ),
+    'next' => array(
+      'label' => t("Field for 'next'"),
+      'description' => t('Select the field containing data used for linking to next item.'),
+    ),
+  );
+}
+
 /**
  * Implementation of hook_init().
  */
@@ -22,10 +43,13 @@ function freepager_init() {
   drupal_add_css($path, 'module', 'all', FALSE);
 }
 
+/**
+ * Implements hook_preprocess_HOOK().
+ */
 function freepager_preprocess_views_freepager(&$vars) {
+  // Let's get some of the data we will need.
   $view = &$vars['view'];
-  $fields = array('path', 'previous', 'current', 'next');
-  
+  $fields = array_keys(freepager_settings());
   foreach($fields as $field) {
     $field_names[$field] = $vars['view']->display_handler->options[$field];
   }
@@ -43,6 +67,25 @@ function freepager_preprocess_views_freepager(&$vars) {
       $vars['next_path'] = $view->render_field($field_names['path'], $key + 1);
       $vars['row_number'] = $key;
       $vars['total_rows'] = count($view->result);
+      
+      // If we found a path match, there is no need to look for another one.
+      return;
     }
+  }
+  
+  // If we got this far, no match against current path was found. Let's indicate
+  // this for use later on.
+  $vars['view']->display_handler->no_path_match = TRUE;
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function freepager_views_post_render(&$view, &$output, &$cache) {
+  // If we didn't find a match against the current path, there will still be
+  // result fetched from the view. To prevent an empty block from being rendered
+  // we tweak this result.
+  if (isset($view->display_handler->no_path_match) && $view->display_handler->no_path_match) {
+    $view->result = FALSE;
   }
 }

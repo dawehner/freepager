@@ -13,10 +13,9 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
   function option_definition() {
     $options = parent::option_definition();
 
-    $options['path'] = array('default' => '');
-    $options['previous'] = array('default' => '');
-    $options['current'] = array('default' => '');
-    $options['next'] = array('default' => '');
+    foreach (array_keys(freepager_settings()) as $setting_name) {
+      $options[$setting_name] = array('default' => '');
+    }
 
     return $options;
   }
@@ -40,50 +39,17 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
       ),
     );
 
-    $block_description = strip_tags($this->get_option('block_description'));
-    if (empty($block_description)) {
-      $block_description = t('None');
-    }
+    $options['block_description']['category'] = 'freepager_block';
 
-    $options['block_description'] = array(
-      'category' => 'freepager_block',
-      'title' => t('Block name'),
-      'value' => views_ui_truncate($block_description, 24),
-    );
-    
+    // Get all the fields present in this view, to use as setting summaries.
     $field_labels = $this->get_field_labels();
-    $options['path'] = array(
-      'category' => 'freepager_block',
-      'title' => t('Path field'),
-      'value' => $field_labels[$this->get_option('path')],
-    );
-    $options['previous'] = array(
-      'category' => 'freepager_block',
-      'title' => t('Previous'),
-      'value' => $field_labels[$this->get_option('previous')],
-    );
-    $options['current'] = array(
-      'category' => 'freepager_block',
-      'title' => t('Current'),
-      'value' => $field_labels[$this->get_option('current')],
-    );
-    $options['next'] = array(
-      'category' => 'freepager_block',
-      'title' => t('Next'),
-      'value' => $field_labels[$this->get_option('next')],
-    );
-
-    $cache_type = $this->get_option('block_caching');
-    if (empty($cache_type)) {
-      $cache_type = DRUPAL_NO_CACHE;
+    foreach (freepager_settings() as $name => $setting) {
+      $options[$name] = array(
+        'category' => 'freepager_block',
+        'title' => $setting['label'],
+        'value' => $field_labels[$this->get_option($name)],
+      );
     }
-
-    $types = $this->block_caching_modes();
-    $options['block_caching'] = array(
-      'category' => 'other',
-      'title' => t('Block caching'),
-      'value' => $types[$this->get_cache_type()],
-    );
   }
 
   /**
@@ -93,36 +59,19 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
     // It is very important to call the parent function here:
     parent::options_form($form, $form_state);
 
-    switch ($form_state['section']) {
-      case 'block_description':
-        $form['#title'] .= t('Block admin description');
-        $form['block_description'] = array(
-          '#type' => 'textfield',
-          '#description' => t('This will appear as the name of this block in administer >> structure >> blocks.'),
-          '#default_value' => $this->get_option('block_description'),
-        );
-        break;
-      case 'block_caching':
-        $form['#title'] .= t('Block caching type');
+    // Set some variables to increase code readability.
+    $freepager_settings = freepager_settings();
+    $section = &$form_state['section'];
 
-        $form['block_caching'] = array(
-          '#type' => 'radios',
-          '#description' => t("This sets the default status for Drupal's built-in block caching method; this requires that caching be turned on in block administration, and be careful because you have little control over when this cache is flushed."),
-          '#options' => $this->block_caching_modes(),
-          '#default_value' => $this->get_cache_type(),
-        );
-        break;
-      case 'path':
-      case 'previous':
-      case 'current':
-      case 'next':
-        $form[$form_state['section']] = array(
-          '#type' => 'select',
-          '#description' => t('Add description later...'),
-          '#options' => $this->get_field_labels(),
-          '#default_value' => $this->get_option($form_state['section']),
-        );
-        break;
+    // If one of Free pager's settings are built, populate the form.
+    if (isset($freepager_settings[$section])) {
+      $form['#title'] .= $freepager_settings[$section]['label'];
+      $form[$form_state['section']] = array(
+        '#type' => 'select',
+        '#description' => $freepager_settings[$section]['description'],
+        '#options' => $this->get_field_labels(),
+        '#default_value' => $this->get_option($section),
+      );
     }
   }
 
@@ -133,23 +82,14 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
   function options_submit(&$form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_submit($form, $form_state);
-    switch ($form_state['section']) {
-      case 'display_id':
-        $this->update_block_bid($form_state['view']->name, $this->display->id, $this->display->new_id);
-        break;
-      case 'block_description':
-        $this->set_option('block_description', $form_state['values']['block_description']);
-        break;
-      case 'block_caching':
-        $this->set_option('block_caching', $form_state['values']['block_caching']);
-        $this->save_block_cache($form_state['view']->name . '-'. $form_state['display_id'], $form_state['values']['block_caching']);
-        break;
-      case 'path':
-      case 'previous':
-      case 'current':
-      case 'next':
-        $this->set_option($form_state['section'], $form_state['values'][$form_state['section']]);
-        break;        
+
+    // Set some variables to increase code readability.
+    $freepager_settings = freepager_settings();
+    $section = &$form_state['section'];
+    
+    // If one of Free pager's settings are submitted, make sure to save them.
+    if (isset($freepager_settings[$section])) {
+      $this->set_option($section, $form_state['values'][$section]);
     }
   }
 }
