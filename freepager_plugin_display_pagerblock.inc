@@ -13,8 +13,10 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
   function option_definition() {
     $options = parent::option_definition();
 
-    $options['block_description'] = array('default' => '', 'translatable' => TRUE);
-    $options['block_caching'] = array('default' => DRUPAL_NO_CACHE);
+    $options['path'] = array('default' => '');
+    $options['previous'] = array('default' => '');
+    $options['current'] = array('default' => '');
+    $options['next'] = array('default' => '');
 
     return $options;
   }
@@ -50,6 +52,11 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
     );
     
     $field_labels = $this->get_field_labels();
+    $options['path'] = array(
+      'category' => 'freepager_block',
+      'title' => t('Path field'),
+      'value' => $field_labels[$this->get_option('path')],
+    );
     $options['previous'] = array(
       'category' => 'freepager_block',
       'title' => t('Previous'),
@@ -105,6 +112,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
           '#default_value' => $this->get_cache_type(),
         );
         break;
+      case 'path':
       case 'previous':
       case 'current':
       case 'next':
@@ -136,6 +144,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
         $this->set_option('block_caching', $form_state['values']['block_caching']);
         $this->save_block_cache($form_state['view']->name . '-'. $form_state['display_id'], $form_state['values']['block_caching']);
         break;
+      case 'path':
       case 'previous':
       case 'current':
       case 'next':
