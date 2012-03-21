@@ -14,7 +14,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
     $options = parent::option_definition();
 
     foreach (array_keys(freepager_settings()) as $setting_name) {
-      $options[$setting_name] = array('default' => '');
+      $options[$setting_name] = array('default' => FALSE);
     }
 
     return $options;
@@ -69,7 +69,7 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
       $form[$form_state['section']] = array(
         '#type' => 'select',
         '#description' => $freepager_settings[$section]['description'],
-        '#options' => $this->get_field_labels(),
+        '#options' => $this->get_field_labels() + array(FALSE => t('(none)')),
         '#default_value' => $this->get_option($section),
       );
     }
