@@ -5,4 +5,4 @@ package = "Experimental"
 dependencies[] = views
 files[] = freepager.module
 files[] = freepager.views.inc
-files[] = freepager_plugin_style.inc
+files[] = freepager_plugin_display_pagerblock.inc

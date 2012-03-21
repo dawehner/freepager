@@ -15,7 +15,7 @@ function freepager_views_plugins() {
       'freepager' => array(
         'title' => t('Pager block'),
         'help' => t('Uses the available fields to build a pager.'),
-        'handler' => 'freepager_plugin_style',
+        'handler' => 'freepager_plugin_display_pagerblock',
         'theme' => 'views_view',
         'uses hook block' => TRUE,
 //        'contextual links locations' => array('block'),

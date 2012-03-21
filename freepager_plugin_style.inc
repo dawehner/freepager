@@ -158,7 +158,6 @@ class freepager_plugin_style extends views_plugin_display_block {
       case 'current':
       case 'next':
         $form['#title'] .= t('Previous/Current/Next');
-
         $form[$form_state['section']] = array(
           '#type' => 'select',
           '#description' => t("Some description."),
