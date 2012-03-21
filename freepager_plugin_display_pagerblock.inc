@@ -28,8 +28,10 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
     // It is very important to call the parent function here:
     parent::options_summary($categories, $options);
 
-    $categories['block'] = array(
-      'title' => t('Block settings'),
+    // Remove the category set by the parent class before adding our own.
+    unset($categories['block']);
+    $categories['freepager_block'] = array(
+      'title' => t('Pager block settings'),
       'column' => 'second',
       'build' => array(
         '#weight' => -10,
@@ -42,9 +44,26 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
     }
 
     $options['block_description'] = array(
-      'category' => 'block',
+      'category' => 'freepager_block',
       'title' => t('Block name'),
       'value' => views_ui_truncate($block_description, 24),
+    );
+    
+    $field_labels = $this->get_field_labels();
+    $options['previous'] = array(
+      'category' => 'freepager_block',
+      'title' => t('Previous'),
+      'value' => $field_labels[$this->get_option('previous')],
+    );
+    $options['current'] = array(
+      'category' => 'freepager_block',
+      'title' => t('Current'),
+      'value' => $field_labels[$this->get_option('current')],
+    );
+    $options['next'] = array(
+      'category' => 'freepager_block',
+      'title' => t('Next'),
+      'value' => $field_labels[$this->get_option('next')],
     );
 
     $cache_type = $this->get_option('block_caching');
@@ -64,7 +83,6 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
    * Provide the default form for setting options.
    */
   function options_form(&$form, &$form_state) {
-    parent::options_form($form, $form_state);
     // It is very important to call the parent function here:
     parent::options_form($form, $form_state);
 
@@ -85,6 +103,16 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
           '#description' => t("This sets the default status for Drupal's built-in block caching method; this requires that caching be turned on in block administration, and be careful because you have little control over when this cache is flushed."),
           '#options' => $this->block_caching_modes(),
           '#default_value' => $this->get_cache_type(),
+        );
+        break;
+      case 'previous':
+      case 'current':
+      case 'next':
+        $form[$form_state['section']] = array(
+          '#type' => 'select',
+          '#description' => t('Add description later...'),
+          '#options' => $this->get_field_labels(),
+          '#default_value' => $this->get_option($form_state['section']),
         );
         break;
     }
@@ -108,6 +136,11 @@ class freepager_plugin_display_pagerblock extends views_plugin_display_block {
         $this->set_option('block_caching', $form_state['values']['block_caching']);
         $this->save_block_cache($form_state['view']->name . '-'. $form_state['display_id'], $form_state['values']['block_caching']);
         break;
+      case 'previous':
+      case 'current':
+      case 'next':
+        $this->set_option($form_state['section'], $form_state['values'][$form_state['section']]);
+        break;        
     }
   }
 }
