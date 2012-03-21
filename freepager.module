@@ -42,6 +42,7 @@ function freepager_preprocess_views_freepager(&$vars) {
       $vars['next'] = $view->render_field($field_names['next'], $key + 1);
       $vars['next_path'] = $view->render_field($field_names['path'], $key + 1);
       $vars['row_number'] = $key;
+      $vars['total_rows'] = count($view->result);
     }
   }
 }

@@ -10,7 +10,6 @@
  */
 function freepager_views_plugins() {
   return array(
-//    'module' => 'freepager', // This just tells our themes are elsewhere.
     'display' => array(
       'freepager' => array(
         'title' => t('Pager block'),

@@ -5,29 +5,39 @@
  *
  * Available variables:
  *
- * $rows['current_row']
- *   The index of the currently viewed item in the list. (Starting on zero!)
- * $rows['total']
- *   The total number of items in the list.
- * $rows['current']['text']
- *   The text designated for the current row. FALSE if no field is set.
- * $rows['previous']['link']
- *   The rendered link for the previous link.
- * $rows['previous']['text']
- *   The text to use for the previous link.
- * $rows['previous']['path']
- *   The url to use for the previous link.
- * $rows['next']['link']
- *   The rendered link for the next link.
- * $rows['next']['text']
- *   The text to use for the next link.
- * $rows['next']['path']
- *   The url to use for the next link.
+ * $previous
+ *   The rendered field used for the row before the viewed one. May be empty.
+ * $previous_path
+ *   The path for the previous row.
+ * $current
+ *   The rendered field used for the currently viewed row.
+ * $current_path
+ *   The current path.
+ * $next
+ *   The rendered field used for the row after the viewed one. May be empty.
+ * $next_path
+ *   The path for the next row.
+ * $row_number
+ *   The number of the viewed row.
+ * $total_rows
+ *   The total number of rows in the list from Views.
  *
  * @ingroup views_templates
  */
 ?>
 
-<?php print $previous; ?><br />
-<?php print $current; ?><br />
-<?php print $next; ?><br />
+<?php if (!empty($previous)): ?>
+  <span class="freepager-previous">
+    <?php print $previous; ?>
+  </span>
+<?php endif; ?>
+<?php if (!empty($current)): ?>
+  <span class="freepager-current">
+    <?php print $current; ?>
+  </span>
+<?php endif; ?>
+<?php if (!empty($next)): ?>
+  <span class="freepager-next">
+    <?php print $next; ?>
+  </span>
+<?php endif; ?>
