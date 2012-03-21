@@ -10,3 +10,7 @@
 .freepager-next {
   float: right;
 }
+
+.freepager-current {
+  text-align: center;
+}
