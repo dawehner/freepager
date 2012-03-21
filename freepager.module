@@ -60,11 +60,11 @@ function freepager_preprocess_views_freepager(&$vars) {
     $rendered_path = $view->render_field($field_names['path'], $key);
     if ($rendered_path == $current_path) {
       $vars['previous'] = $view->render_field($field_names['previous'], $key - 1);
-      $vars['previous_path'] = $view->render_field($field_names['path'], $key - 1);
+      $vars['previous_linked'] = l($vars['previous'], $view->render_field($field_names['path'], $key - 1), array('html' => TRUE));
       $vars['current'] = $view->render_field($field_names['current'], $key);
-      $vars['current_path'] = $view->render_field($field_names['path'], $key);
+      $vars['current_linked'] = l($vars['current'], $view->render_field($field_names['path'], $key), array('html' => TRUE));
       $vars['next'] = $view->render_field($field_names['next'], $key + 1);
-      $vars['next_path'] = $view->render_field($field_names['path'], $key + 1);
+      $vars['next_linked'] = l($vars['next'], $view->render_field($field_names['path'], $key + 1), array('html' => TRUE));
       $vars['row_number'] = $key;
       $vars['total_rows'] = count($view->result);
       

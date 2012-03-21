@@ -7,16 +7,16 @@
  *
  * $previous
  *   The rendered field used for the row before the viewed one. May be empty.
- * $previous_path
- *   The path for the previous row.
+ * $previous_linked
+ *   The 'previous' field, linking to the previous page.
  * $current
  *   The rendered field used for the currently viewed row.
- * $current_path
- *   The current path.
+ * $current_linked
+ *   The 'current' field, linking to the current page. Not highly useful.
  * $next
  *   The rendered field used for the row after the viewed one. May be empty.
- * $next_path
- *   The path for the next row.
+ * $next_linked
+ *   The 'next' field, linking to the next page.
  * $row_number
  *   The number of the viewed row.
  * $total_rows
@@ -28,16 +28,16 @@
 
 <?php if (!empty($previous)): ?>
   <span class="freepager-previous">
-    <?php print $previous; ?>
-  </span>
-<?php endif; ?>
-<?php if (!empty($current)): ?>
-  <span class="freepager-current">
-    <?php print $current; ?>
+    <?php print $previous_linked; ?>
   </span>
 <?php endif; ?>
 <?php if (!empty($next)): ?>
   <span class="freepager-next">
-    <?php print $next; ?>
+    <?php print $next_linked; ?>
   </span>
+<?php endif; ?>
+<?php if (!empty($current)): ?>
+  <div class="freepager-current">
+    <?php print $current; ?>
+  </div>
 <?php endif; ?>
