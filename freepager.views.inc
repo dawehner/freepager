@@ -16,7 +16,7 @@ function freepager_views_plugins() {
         'title' => t('Pager block'),
         'help' => t('Uses the available fields to build a pager.'),
         'handler' => 'freepager_plugin_display_pagerblock',
-        'theme' => 'views_view',
+        'theme' => 'views_freepager',
         'uses hook block' => TRUE,
 //        'contextual links locations' => array('block'),
 //        'use ajax' => TRUE,

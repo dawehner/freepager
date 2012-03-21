@@ -27,6 +27,7 @@
  * @ingroup views_templates
  */
 ?>
+Am I here?
 <?php if (!empty($title)): ?>
   <h3><?php print $title; ?></h3>
 <?php endif; ?>

@@ -21,3 +21,12 @@ function freepager_init() {
   $path = drupal_get_path('module', 'freepager') .'/freepager.css';
   drupal_add_css($path, 'module', 'all', FALSE);
 }
+
+function freepager_preprocess_views_freepager(&$vars) {
+  $fields = array('path', 'previous', 'current', 'next');
+  
+  foreach($fields as $field) {
+    $field_names[$field] = $vars['view']->display_handler->options[$field];
+  }
+  dpm($vars['view']->result);
+}
