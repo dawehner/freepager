@@ -58,6 +58,10 @@ function freepager_settings() {
       'label' => t("Field for 'next'"),
       'description' => t('Select the field containing data used for linking to next item.'),
     ),
+    'loop' => array(
+      'label' => t("Loop the pager"),
+      'description' => t('Check this box to have the last item followed by the first one, and vice versa.'),
+    ),
   );
 }
 
@@ -85,11 +89,18 @@ function freepager_preprocess_views_freepager(&$vars) {
     // Check if the path in the view is the same as we're viewing.
     $rendered_path = $view->render_field($field_names['path'], $row_number);
     if ($rendered_path == $current_path) {
+      $count = count($view->result);
 
       if ($field_names['previous']) {
-      	_freepager_render_req_fields($view, $row_number - 1);
-        $vars['previous'] = $view->render_field($field_names['previous'], $row_number - 1);
-        $vars['previous_linked'] = l($vars['previous'], $view->render_field($field_names['path'], $row_number - 1), array('html' => TRUE));
+        $previous_row_number = ($row_number - 1);
+        // Loop the 'previous' index, if the pager is set to loop.
+        if ($view->display_handler->get_option('loop')) {
+          $previous_row_number = ($row_number + $count - 1) % $count;
+        }
+
+      	_freepager_render_req_fields($view, $previous_row_number);
+        $vars['previous'] = $view->render_field($field_names['previous'], $previous_row_number);
+        $vars['previous_linked'] = l($vars['previous'], $view->render_field($field_names['path'], $previous_row_number), array('html' => TRUE));
       }
       if ($field_names['current']) {
       	_freepager_render_req_fields($view, $row_number);
@@ -97,12 +108,18 @@ function freepager_preprocess_views_freepager(&$vars) {
         $vars['current_linked'] = l($vars['current'], $view->render_field($field_names['path'], $row_number), array('html' => TRUE));
       }
       if ($field_names['next']) {
-      	_freepager_render_req_fields($view, $row_number + 1);
-        $vars['next'] = $view->render_field($field_names['next'], $row_number + 1);
-        $vars['next_linked'] = l($vars['next'], $view->render_field($field_names['path'], $row_number + 1), array('html' => TRUE));
+        $next_row_number = ($row_number + 1);
+        // Loop the 'next' index, if the pager is set to loop.
+        if ($view->display_handler->get_option('loop')) {
+          $next_row_number = ($row_number + 1) % $count;
+        }
+
+      	_freepager_render_req_fields($view, $next_row_number);
+        $vars['next'] = $view->render_field($field_names['next'], $next_row_number);
+        $vars['next_linked'] = l($vars['next'], $view->render_field($field_names['path'], $next_row_number), array('html' => TRUE));
       }
       $vars['row_number'] = $row_number;
-      $vars['total_rows'] = count($view->result);
+      $vars['total_rows'] = $count;
 
       // If we found a path match, there is no need to look for another one.
       // Let's break to save a few clock cycles.
