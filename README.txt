@@ -34,3 +34,10 @@ A few notes:
   which for 1000 items means a bit more than half a second of work (and quite
   a bit of memory consumption). If you want to browse thousands of items,
   strongly consider using another module.
+
+There is an example feature provided by this module, showing one way of using
+Free pager to flip through content sharing the same taxonomy term. This feature
+is for educational purpose only.
+When enabled, place the block "Free pager: section browser" in a region of your
+choice and create a few nodes of the type "news". The section browser will
+provide links to the older/newer content sharing the same section.
