@@ -76,6 +76,7 @@ function freepager_preprocess_views_freepager(&$vars) {
 
   // Let's get some of the data we will need.
   $view = &$vars['view'];
+  $rendered_result = $view->style_plugin->render_fields($view->result);
   $fields = array_keys(freepager_settings());
   foreach($fields as $field) {
     $field_names[$field] = $vars['view']->display_handler->options[$field];
@@ -84,13 +85,14 @@ function freepager_preprocess_views_freepager(&$vars) {
   $current_path = implode('/', arg());
 
   // Let's go see if we're looking at a page matching the provided paths.
-  foreach (array_keys($view->result) as $row_number) {
+  foreach ($rendered_result as $row_number => $result) {
 
     // Check if the path in the view is the same as we're viewing.
-    $rendered_path = $view->render_field($field_names['path'], $row_number);
-    if ($rendered_path == $current_path) {
+    //$rendered_path = $view->render_field($field_names['path'], $row_number);
+    if ($result[$field_names['path']] == $current_path) {
       $count = count($view->result);
 
+      // Build the 'previous' item.
       if ($field_names['previous']) {
         $previous_row_number = ($row_number - 1);
         // Loop the 'previous' index, if the pager is set to loop.
@@ -98,15 +100,19 @@ function freepager_preprocess_views_freepager(&$vars) {
           $previous_row_number = ($row_number + $count - 1) % $count;
         }
 
-      	_freepager_render_req_fields($view, $previous_row_number);
-        $vars['previous'] = $view->render_field($field_names['previous'], $previous_row_number);
-        $vars['previous_linked'] = l($vars['previous'], $view->render_field($field_names['path'], $previous_row_number), array('html' => TRUE));
+        if ($previous_row_number >= 0) {
+          $vars['previous'] = $rendered_result[$previous_row_number][$field_names['previous']];
+          $vars['previous_linked'] = l($vars['previous'], $rendered_result[$previous_row_number][$field_names['path']], array('html' => TRUE));
+        }
       }
+
+      // Build the 'current' item.
       if ($field_names['current']) {
-      	_freepager_render_req_fields($view, $row_number);
-        $vars['current'] = $view->render_field($field_names['current'], $row_number);
-        $vars['current_linked'] = l($vars['current'], $view->render_field($field_names['path'], $row_number), array('html' => TRUE));
+        $vars['current'] = $rendered_result[$row_number][$field_names['current']];
+        $vars['current_linked'] = l($vars['current'], $rendered_result[$row_number][$field_names['path']], array('html' => TRUE));
       }
+
+      // Build the 'next' item.
       if ($field_names['next']) {
         $next_row_number = ($row_number + 1);
         // Loop the 'next' index, if the pager is set to loop.
@@ -114,9 +120,10 @@ function freepager_preprocess_views_freepager(&$vars) {
           $next_row_number = ($row_number + 1) % $count;
         }
 
-      	_freepager_render_req_fields($view, $next_row_number);
-        $vars['next'] = $view->render_field($field_names['next'], $next_row_number);
-        $vars['next_linked'] = l($vars['next'], $view->render_field($field_names['path'], $next_row_number), array('html' => TRUE));
+        if ($next_row_number < $count) {
+          $vars['next'] = $rendered_result[$next_row_number][$field_names['next']];
+          $vars['next_linked'] = l($vars['next'], $rendered_result[$next_row_number][$field_names['path']], array('html' => TRUE));
+        }
       }
       $vars['row_number'] = $row_number;
       $vars['total_rows'] = $count;
@@ -130,19 +137,6 @@ function freepager_preprocess_views_freepager(&$vars) {
   // If we got this far, no match against current path was found. Let's indicate
   // this for use later on.
   $vars['view']->display_handler->no_path_match = TRUE;
-}
-
-/**
- * Internal function
- *
- * Prepare *all* the fields in this row – there may be token replacement
- * patterns required by the fields we use. And also prepare the fields
- * in the previous and next rows.
- */
-function _freepager_render_req_fields($view, $row_to_render){
-  foreach(array_keys($view->display_handler->get_field_labels()) as $field_name) {
-    $view->render_field($field_name, $row_to_render);
-  }
 }
 
 /**
