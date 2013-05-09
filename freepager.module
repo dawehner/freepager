@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Declares Views API version. And adds CSS.
+ * Some basic function for Free pager. Mostly implementations of Views hooks.
  */
 
 /**
@@ -14,6 +14,32 @@ function freepager_views_api() {
   );
 }
 
+/**
+ * Implements hook_libraries_info().
+ */
+function freepager_libraries_info() {
+  $libraries['jquery-mobile'] = array(
+    'name' => 'jQuery mobile',
+    'vendor url' => 'http://jquerymobile.com/',
+    'download url' => 'http://jquerymobile.com/download/',
+    'files' => array(
+      'js' => array('jquery.mobile.js' => array()),
+    ),
+    'version arguments' => array(
+      'file' => 'jquery.mobile.js',
+      // Best practice: Document the actual version strings for later reference.
+      // 1.x: Version 1.0
+      'pattern' => '/jQuery Mobile (\d+)/',
+      'lines' => 2,
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Helper function to keep track of settings used by Free pager in Views.
+ * @return type
+ */
 function freepager_settings() {
   return array(
     'path' => array(
@@ -39,6 +65,11 @@ function freepager_settings() {
  * Implements hook_preprocess_HOOK().
  */
 function freepager_preprocess_views_freepager(&$vars) {
+  // If the jQuery mobile library is present, load it and run some helping JS.
+  if (($library = libraries_load('jquery-mobile')) && !empty($library['loaded'])) {
+    drupal_add_js(drupal_get_path('module', 'freepager') . '/freepager.js');
+  }
+
   // Let's get some of the data we will need.
   $view = &$vars['view'];
   $fields = array_keys(freepager_settings());
@@ -92,11 +123,9 @@ function freepager_preprocess_views_freepager(&$vars) {
  * in the previous and next rows.
  */
 function _freepager_render_req_fields($view, $row_to_render){
-
-	foreach(array_keys($view->display_handler->get_field_labels()) as $field_name) {
-		$view->render_field($field_name, $row_to_render);
-	}
-
+  foreach(array_keys($view->display_handler->get_field_labels()) as $field_name) {
+    $view->render_field($field_name, $row_to_render);
+  }
 }
 
 /**
