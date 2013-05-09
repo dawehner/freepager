@@ -36,8 +36,16 @@ A few notes:
   strongly consider using another module.
 
 There is an example feature provided by this module, showing one way of using
-Free pager to flip through content sharing the same taxonomy term. This feature
-is for educational purpose only.
-When enabled, place the block "Free pager: section browser" in a region of your
-choice and create a few nodes of the type "news". The section browser will
-provide links to the older/newer content sharing the same section.
+Free pager to flip through content sharing the same taxonomy term.
+To use the demo feature:
+* Enable the feature, either from the modules list or the features page.
+* Go to structure > taxonomy > section and add at least one section.
+* Go to structure > blocks and place "Free pager: section browser" in a region
+  of your choice.
+* Create a few nodes of the type "news".
+
+When viewing a node marked with a section, Free pager will provide links to the
+older/newer content sharing the same section.
+Note that this feature is for educational purpose only. If used on an actual
+news site, Views would soon choke on the number of items to render on every
+page.
