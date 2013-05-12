@@ -133,10 +133,14 @@ function freepager_preprocess_views_freepager(&$vars) {
   $vars['row_number'] = $row_number;
   $vars['total_rows'] = $count;
 
-  // If the jQuery mobile library is present, load it and run some helping JS.
-  if (($library = libraries_load('jquery-mobile')) && !empty($library['loaded'])) {
-    drupal_add_js(drupal_get_path('module', 'freepager') . '/freepager.js');
-  }
+// This is commented out, while waiting for a better solution (and jQuery
+// implementation that follows coding standards. See
+// http://drupal.org/node/1966002#comment-7398708 .
+//
+//  // If the jQuery mobile library is present, load it and run some helping JS.
+//  if (($library = libraries_load('jquery-mobile')) && !empty($library['loaded'])) {
+//    drupal_add_js(drupal_get_path('module', 'freepager') . '/freepager.js');
+//  }
 }
 
 /**
