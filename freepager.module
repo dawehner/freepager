@@ -105,7 +105,7 @@ function freepager_preprocess_views_freepager(&$vars) {
 
     if ($previous_row_number >= 0) {
       $vars['previous'] = $rendered_result[$previous_row_number][$field_names['previous']];
-      $vars['previous_linked'] = l($vars['previous'], $rendered_result[$previous_row_number][$field_names['path']], array('html' => TRUE));
+      $vars['previous_linked'] = l($vars['previous'], $rendered_result[$previous_row_number][$field_names['path']], array('html' => TRUE, 'attributes' => array('rel' => 'prev')));
     }
   }
 
@@ -125,7 +125,7 @@ function freepager_preprocess_views_freepager(&$vars) {
 
     if ($next_row_number < $count) {
       $vars['next'] = $rendered_result[$next_row_number][$field_names['next']];
-      $vars['next_linked'] = l($vars['next'], $rendered_result[$next_row_number][$field_names['path']], array('html' => TRUE));
+      $vars['next_linked'] = l($vars['next'], $rendered_result[$next_row_number][$field_names['path']], array('html' => TRUE, 'attributes' => array('rel' => 'next')));
     }
   }
 
