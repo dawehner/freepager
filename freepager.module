@@ -71,6 +71,12 @@ function freepager_settings() {
 function freepager_preprocess_views_freepager(&$vars) {
   // Let's get some of the data we will need.
   $view = &$vars['view'];
+
+  if(count($view->result) <= 1) {
+    $view->result = array();
+    return;
+  }
+
   $rendered_result = $view->style_plugin->render_fields($view->result);
   $fields = array_keys(freepager_settings());
   foreach($fields as $field) {
