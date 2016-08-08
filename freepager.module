@@ -12,6 +12,18 @@ use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\ViewExecutable;
 
 /**
+ * Removes all HTML comments as well as trailing newlines etc. from a string.
+ *
+ * @param string $content
+ *   The string with potential HTML comments.
+ *
+ * @return string
+ *   The cleaned up string.
+ */
+function _freepager_remove_html_comments($content) {
+  return trim(preg_replace('/<!--(.|\s)*?-->/', '', $content));
+}
+/**
  * Implements hook_preprocess_HOOK().
  */
 function freepager_preprocess_views_freepager(&$vars) {
@@ -29,14 +41,17 @@ function freepager_preprocess_views_freepager(&$vars) {
   $field_names = array_map(function ($field) use ($view) {
     return $view->display_handler->getOption($field);
   }, array_combine($fields, $fields));
-  $current_url = Url::fromRoute('<current>');
+  $current_url = Url::fromRoute('<current>', [], ['alias' => TRUE, 'path_processing' => FALSE]);
   $current_url_string = $current_url->toString();
 
   // Let's go see if we're looking at a page matching the provided paths.
   $row_number = -1;
   foreach ($view->result as $row => $result) {
     $rendered_fields = _freepager_render_views_row($view, $row, $field_names['path']);
-    if ($rendered_fields[$field_names['path']] == $current_url_string) {
+    // When twig debug mode is active, the rendered field output contains the
+    // HTML comments from the twig debug mode. In order to still be able to
+    // compare the paths, we strip HTML comments from it.
+    if (_freepager_remove_html_comments($rendered_fields[$field_names['path']]) == $current_url_string) {
       $row_number = $row;
       break;
     }
