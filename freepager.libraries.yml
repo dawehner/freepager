@@ -1,0 +1,6 @@
+freepager:
+  css:
+    theme:
+      css/freepager.css: {}
+  js:
+    js/freepager.js: {}

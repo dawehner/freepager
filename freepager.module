@@ -6,66 +6,6 @@
  */
 
 /**
- * Implementation of hook_views_api().
- */
-function freepager_views_api() {
-  return array(
-    'api' => '3.0',
-  );
-}
-
-/**
- * Implements hook_libraries_info().
- */
-function freepager_libraries_info() {
-  $libraries['jquery-mobile'] = array(
-    'name' => 'jQuery mobile',
-    'vendor url' => 'http://jquerymobile.com/',
-    'download url' => 'http://jquerymobile.com/download/',
-    'files' => array(
-      'js' => array('jquery.mobile.js' => array()),
-    ),
-    'version arguments' => array(
-      'file' => 'jquery.mobile.js',
-      // Best practice: Document the actual version strings for later reference.
-      // 1.x: Version 1.0
-      'pattern' => '/jQuery Mobile (\d+)/',
-      'lines' => 2,
-    ),
-  );
-  return $libraries;
-}
-
-/**
- * Helper function to keep track of settings used by Free pager in Views.
- * @return type
- */
-function freepager_settings() {
-  return array(
-    'path' => array(
-      'label' => t('Field containing path'),
-      'description' => t("Select the field containing the paths managed by this pager. Field could contain something on the form 'node/[nid]'."),
-    ),
-    'previous' => array(
-      'label' => t("Field for 'previous'"),
-      'description' => t('Select the field containing data used for linking to previous item.'),
-    ),
-    'current' => array(
-      'label' => t("Field for 'current'"),
-      'description' => t('Select the field containing data used for showing the currently viewed item.'),
-    ),
-    'next' => array(
-      'label' => t("Field for 'next'"),
-      'description' => t('Select the field containing data used for linking to next item.'),
-    ),
-    'loop' => array(
-      'label' => t("Loop the pager"),
-      'description' => t('Check this box to have the last item followed by the first one, and vice versa.'),
-    ),
-  );
-}
-
-/**
  * Implements hook_preprocess_HOOK().
  */
 function freepager_preprocess_views_freepager(&$vars) {
@@ -77,7 +17,7 @@ function freepager_preprocess_views_freepager(&$vars) {
     return;
   }
 
-  $fields = array_keys(freepager_settings());
+  $fields = array_keys(\Drupal\freepager\Plugin\views\display\Freepager::pagerSettings());
   foreach($fields as $field) {
     $field_names[$field] = $view->display_handler->options[$field];
   }
