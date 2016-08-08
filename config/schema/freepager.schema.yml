@@ -1,0 +1,14 @@
+views.display.block:
+  type: views.display.block
+  label: 'Freepager'
+  mapping:
+    path:
+      type: string
+    previous:
+      type: string
+    current:
+      type: string
+    next:
+      type: string
+    loop:
+      type: boolean

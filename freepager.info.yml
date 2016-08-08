@@ -2,6 +2,6 @@ name: Free Pager
 description: Creates a pager Views style, used for paging arbitrary pages.
 core: 8.x
 package: Other
+type: module
 dependencies:
   - views
-stylesheets[all][] = freepager.css

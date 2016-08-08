@@ -61,7 +61,7 @@ class Freepager extends Block {
     return [
       'path' => [
         'label' => t('Field containing path'),
-        'description' => t("Select the field containing the paths managed by this pager. Field could contain something on the form 'node/[nid]'."),
+        'description' => t("Select the field containing the paths managed by this pager. Field could contain something on the form 'node/{{ nid__value }}'."),
       ],
       'previous' => [
         'label' => t("Field for 'previous'"),
@@ -155,11 +155,11 @@ class Freepager extends Block {
 
     // Set some variables to increase code readability.
     $freepager_settings = static::pagerSettings();
-    $section = &$form_state['section'];
+    $section = $form_state->get('section');
 
     // If one of Free pager's settings are submitted, make sure to save them.
     if (isset($freepager_settings[$section])) {
-      $this->setOption($section, $form_state['values'][$section]);
+      $this->setOption($section, $form_state->getValue($section));
     }
   }
 

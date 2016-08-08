@@ -5,29 +5,39 @@
  * Some basic function for Free pager. Mostly implementations of Views hooks.
  */
 
+use Drupal\Core\Link;
+use Drupal\Core\Url;
+use Drupal\freepager\Plugin\views\display\Freepager;
+use Drupal\views\Plugin\views\cache\CachePluginBase;
+use Drupal\views\ResultRow;
+use Drupal\views\ViewExecutable;
+
 /**
  * Implements hook_preprocess_HOOK().
  */
 function freepager_preprocess_views_freepager(&$vars) {
   // Let's get some of the data we will need.
-  $view = &$vars['view'];
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = $vars['view'];
 
-  if(count($view->result) <= 1) {
-    $view->result = array();
+  if (count($view->result) <= 1) {
+    $view->result = [];
     return;
   }
 
-  $fields = array_keys(\Drupal\freepager\Plugin\views\display\Freepager::pagerSettings());
-  foreach($fields as $field) {
-    $field_names[$field] = $view->display_handler->options[$field];
-  }
-  $current_path = implode('/', arg());
+  $fields = array_keys(Freepager::pagerSettings());
+  /** @var string[] $field_names */
+  $field_names = array_map(function ($field) use ($view) {
+    return $view->display_handler->getOption($field);
+  }, array_combine($fields, $fields));
+  $current_url = Url::fromRoute('<current>');
+  $current_url_string = $current_url->toString();
 
   // Let's go see if we're looking at a page matching the provided paths.
   $row_number = -1;
   foreach ($view->result as $row => $result) {
     $rendered_fields = _freepager_render_views_row($view, $row, $field_names['path']);
-    if ($rendered_fields[$field_names['path']] == $current_path) {
+    if ($rendered_fields[$field_names['path']] == $current_url_string) {
       $row_number = $row;
       break;
     }
@@ -35,24 +45,24 @@ function freepager_preprocess_views_freepager(&$vars) {
 
   // If no hit is found, set a flag and quit.
   if ($row_number == -1) {
-    $view->display_handler->no_path_match = TRUE;
+    $view->display_handler->noPathMatch = TRUE;
     return;
   }
 
   $count = count($view->result);
-  $params = drupal_get_query_parameters();
+   $params = \Drupal::request()->query->all();
   // Build the 'previous' item.
   if ($field_names['previous']) {
     $previous_row_number = ($row_number - 1);
     // Loop the 'previous' index, if the pager is set to loop.
-    if ($previous_row_number < 0 && $view->display_handler->get_option('loop')) {
+    if ($previous_row_number < 0 && $view->display_handler->getOption('loop')) {
       $previous_row_number += $count;
     }
 
     if ($previous_row_number >= 0) {
       $previous_rendered_fields = _freepager_render_views_row($view, $previous_row_number);
       $vars['previous'] = $previous_rendered_fields[$field_names['previous']];
-      $vars['previous_linked'] = l($vars['previous'], $previous_rendered_fields[$field_names['path']], array('query'=> $params, 'html' => TRUE, 'attributes' => array('rel' => 'prev')));
+      $vars['previous_linked'] = Link::fromTextAndUrl($vars['previous'], Url::fromUri('base:/' . $previous_rendered_fields[$field_names['path']], ['query'=> $params, 'attributes' => ['rel' => 'prev']]));
     }
   }
 
@@ -60,21 +70,21 @@ function freepager_preprocess_views_freepager(&$vars) {
   if ($field_names['current']) {
     $rendered_fields = _freepager_render_views_row($view, $row_number);
     $vars['current'] = $rendered_fields[$field_names['current']];
-    $vars['current_linked'] = l($vars['current'], $rendered_fields[$field_names['path']], array('query'=> $params,'html' => TRUE));
+    $vars['current_linked'] = Link::fromTextAndUrl($vars['current'], Url::fromUri('base:/' . $rendered_fields[$field_names['path']], ['query'=> $params]));
   }
 
   // Build the 'next' item.
   if ($field_names['next']) {
     $next_row_number = $row_number + 1;
     // Loop the 'next' index, if the pager is set to loop.
-    if ($next_row_number >= $count && $view->display_handler->get_option('loop')) {
+    if ($next_row_number >= $count && $view->display_handler->getOption('loop')) {
       $next_row_number -= $count;
     }
 
     if ($next_row_number < $count) {
       $next_rendered_fields = _freepager_render_views_row($view, $next_row_number);
       $vars['next'] = $next_rendered_fields[$field_names['next']];
-      $vars['next_linked'] = l($vars['next'], $next_rendered_fields[$field_names['path']], array('query' => $params, 'html' => TRUE, 'attributes' => array('rel' => 'next')));
+      $vars['next_linked'] = Link::fromTextAndUrl($vars['next'], Url::fromUri('base:/' . $next_rendered_fields[$field_names['path']], ['query'=> $params, 'attributes' => ['rel' => 'next']]));
     }
   }
 
@@ -95,11 +105,11 @@ function freepager_preprocess_views_freepager(&$vars) {
 /**
  * Implements hook_views_post_render().
  */
-function freepager_views_post_render(&$view, &$output, &$cache) {
+function freepager_views_post_render(ViewExecutable $view, &$output, CachePluginBase $cache) {
   // If we didn't find a match against the current path, there will still be
   // result fetched from the view. To prevent an empty block from being rendered
   // we tweak this result.
-  if (isset($view->display_handler->no_path_match) && $view->display_handler->no_path_match) {
+  if (isset($view->display_handler->noPathMatch) && $view->display_handler->noPathMatch) {
     $view->result = FALSE;
   }
 }
@@ -109,10 +119,10 @@ function freepager_views_post_render(&$view, &$output, &$cache) {
  *
  * @see views_plugin_style::render_fields()
  */
-function _freepager_render_views_row($view, $row, $upto = NULL) {
-  $rendered_fields = array();
+function _freepager_render_views_row(ViewExecutable $view, $row_index, $upto = NULL) {
+  $rendered_fields = [];
   foreach (array_keys($view->field) as $id) {
-    $rendered_fields[$id] = $view->field[$id]->theme($view->result[$row]);
+    $rendered_fields[$id] = $view->getStyle()->getField($row_index, $id);
     if (isset($upto) && $id == $upto) {
       break;
     }
