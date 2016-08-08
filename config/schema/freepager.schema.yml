@@ -1,4 +1,4 @@
-views.display.block:
+views.display.freepager:
   type: views.display.block
   label: 'Freepager'
   mapping:

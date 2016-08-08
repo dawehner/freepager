@@ -9,7 +9,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\freepager\Plugin\views\display\Freepager;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
-use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
 /**
